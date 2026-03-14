@@ -97,4 +97,61 @@ event:FireServer("Hello, from the client!", key)
 event:FireServer("Hello, from the EVIL client!", key+1)
 ```
 ------
-As you can see from above, the client sends out 2 packages; 1 correct, and 1 wrong. If you run the code, the faulty package would be ignored for having the wrong session key.
+As you can see from above, the client sends out 2 packages; 1 correct, and 1 wrong. If you run the code, the faulty package would be ignored for having the wrong session key. There's one more feature that I have yet to show you...
+## External Logging
+Yes, there is a logging system that doesn't take up all the space in the `Output`. Instead, all the logs are saved into a table, and is saved inside `ShellFlow.logs`. Logs are saved separately and are not merged. I'll see if I can fix this in the near future. Anyway, you can create a log using `ShellFlow.server.Log("Message", 1)` or `ShellFlow.client.Log("Message", 2)`. They'll bug out if the wrong version is used on the wrong viewer. Anyway, here's the full code without any comments, and with the logging system embedded.
+
+```lua
+--- SERVER SCRIPT ---
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+
+shellFlow.server.Init()
+
+local event = shellFlow.server.StoreEvent("Event", "RemoteEvent", 1)
+
+local log = shellFlow.server.Log
+
+task.wait(1)
+
+event.OnServerEvent:Connect(function(player, message, sessionKey)
+	log("OnServerEvent", 1)
+
+	local key = shellFlow.server.ReadKey("Event")
+
+	if sessionKey==key then
+		log("Session Key Matched", 1)
+
+		print("CLIENT SAID: " .. tostring(message))
+	else
+		log("Session Key Didn't match; untruthful client", 2)
+
+		local clientLimit = event:GetAttribute("ClientLimit")
+		event:SetAttribute("ClientLimit", clientLimit+1)
+
+		print("LIAR!")
+	end
+end)
+
+task.wait(3)
+
+print(shellFlow.logs, "From the server!")
+```
+
+```lua
+--- CLIENT SCRIPT ---
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+
+task.wait(1)
+
+local log = shellFlow.server.Log
+
+log("Obtained Event + key", 1)
+local event, key = shellFlow.client.ReadEvent("Event")
+
+log("FireServer", 1)
+event:FireServer("this is a passed down message", key)
+
+task.wait(3)
+
+print(shellFlow.logs, "From the client!")
+```
