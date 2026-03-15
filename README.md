@@ -200,7 +200,7 @@ shellFlow.server.Init()
 
 shellFlow.server.StoreEvent("Messenger", "RemoteEvent")
 
-local event = sshelLFlow.server.ReadEvent("Messenger")
+local event = shellFlow.server.ReadEvent("Messenger")
 ```
 
 ### ShellFlow.server.ReadKey(eventName: string)
