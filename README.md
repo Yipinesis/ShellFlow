@@ -67,10 +67,10 @@ local event = shellFlow.server.StoreEvent("Event", "RemoteEvent", 1)
 -- Linking a function to the event with a sessionKey parameter
 event.OnServerEvent:Connect(function(player, message, sessionKey)
   -- Reads the key; automatically sends player data too
-	local key = shellFlow.server.ReadKey("Event")
+	local key, accessToEvent = shellFlow.server.ReadKey("Event", player)
 
   -- Checks if the correct key matches with the key given by the player
-	if sessionKey==key then
+	if sessionKey==key and accessToEvent then
     -- Success!
 		print("CLIENT SAID: " .. tostring(message))
 	else
@@ -151,4 +151,112 @@ event:FireServer("this is a passed down message", key)
 event.OnClientEvent:Connect(function(message)
 	print("SERVER SAID: " .. tostring(message))
 end)
+```
+# API
+## Server
+### ShellFlow.server.Init()
+
+Initializes the server. Run immediately after requiring the ShellFlow module.
+
+```lua
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+shellFlow.server.Init()
+```
+
+### ShellFlow.server.StoreEvent(EventName: string, EventType: string, ClientLimit: number?)
+
+Stores and creates an event locally and universally.
+
+```lua
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+shellFlow.server.Init()
+
+local event = shellFlow.server.StoreEvent("Messenger", "RemoteEvent")
+```
+
+### ShellFlow.server.RemovePlayerPermissions(eventName: string, player: Player)
+
+Increments ClientLimit by 1 if the requested player is trusted, but gave the wrong ID. Doesn't do anything if an outsider attempts to run the event while not on the list.
+
+```lua
+event.OnServerEvent:Connect(function(player, message, sessionKey)
+	local key, accessToEvent = shellFlow.server.ReadKey("Event", player)
+
+	if sessionKey==key and accessToEvent then
+		print("CLIENT SAID: " .. tostring(message))
+	else
+		shellFlow.server.RemovePlayerPermissions("Messenger", player)
+	end
+end)
+```
+
+### ShellFlow.server.ReadEvent(eventName: string)
+
+Reads an event from the Server. Not too necessary or useful.
+
+```lua
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+shellFlow.server.Init()
+
+shellFlow.server.StoreEvent("Messenger", "RemoteEvent")
+
+local event = sshelLFlow.server.ReadEvent("Messenger")
+```
+
+### ShellFlow.server.ReadKey(eventName: string)
+
+Fetches a key from the Server, typically to validate if a Client's session key is correct.
+
+```lua
+event.OnServerEvent:Connect(function(player, message, sessionKey)
+	local key, accessToEvent = shellFlow.server.ReadKey("Event", player)
+
+	if sessionKey==key and accessToEvent then
+		print("CLIENT SAID: " .. tostring(message))
+	else
+		shellFlow.server.RemovePlayerPermissions("Messenger", player)
+	end
+end)
+```
+
+### ShellFlow.server.Log(message: string, level: number)
+
+Creates a new log and saves it into `ShellFlow.logs`.
+
+```lua
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+shellFlow.server.Init()
+shellFlow.server.Log("Initialized ShellFlow", 1)
+
+local event = shellFlow.server.StoreEvent("Messenger", "RemoteEvent")
+shellFlow.server.Log("Created 'Messenger' RemoteEvent", 1)
+
+print(shellFlow.logs)
+```
+
+## Client
+
+### ShellFlow.client.ReadEvent(eventName: string)
+
+Reads an event from the Client, creates a session key, and adds the user into a trusted list.
+
+```lua
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+
+local event: RemoteEvent = shellFlow.client.ReadEvent("Messenger")
+
+```
+
+### ShellFlow.client.Log(message: string, level: number)
+
+Creates a new log and saves it into `ShellFlow.logs`.
+
+```lua
+local shellFlow = require(game.ReplicatedStorage.ShellFlow)
+
+local event: RemoteEvent = shellFlow.client.ReadEvent("Messenger")
+shellFlow.client.Log("Fetched 'Messenger' RemoteEvent", 1)
+
+print(shellFlow.logs)
+
 ```
