@@ -1,7 +1,7 @@
 # ShellFlow: Roblox Networking API
 ShellFlow is an API created inside Roblox Studio that acts as a Shell over RemoteEvents, allowing users to use RemoteEvents safely without having to worry about unexpected interruptions. ShellFlow keeps events hidden and secure with confirmation into an event, and confirmation outside an event; and it's extremely simple! I created this project a couple months ago, and I have just started working on it again, as I need it for my Roblox project.
 ## The Basics
-First, we'll have to go over the basics. ShellFlow is currently in `V1.0.0` as of righting this, so expect things to not function correctly. However, if your version is in `V1.X.X`, then this guide should still be up to date; with less bugs. Anyway, enough blabbering. First, you'll have to go the
+First, we'll have to go over the basics. ShellFlow is currently in `V1.1.0-prerelease2` as of righting this, so expect things to not function correctly. However, if your version is in `V1.X.X`, then this guide should still be up to date; with less bugs. Anyway, enough blabbering. First, you'll have to go the
 [ShellFlow](https://create.roblox.com/store/asset/103326929320392/ShellFlow-V110prerelease2) asset, then insert it into **ReplicatedStorage**.
 
 ![Image](Images/1.png)
