@@ -2,7 +2,7 @@
 ShellFlow is an API created inside Roblox Studio that acts as a Shell over RemoteEvents, allowing users to use RemoteEvents safely without having to worry about unexpected interruptions. ShellFlow keeps events hidden and secure with confirmation into an event, and confirmation outside an event; and it's extremely simple! I created this project a couple months ago, and I have just started working on it again, as I need it for my Roblox project.
 ## The Basics
 First, we'll have to go over the basics. ShellFlow is currently in `V1.0.0` as of righting this, so expect things to not function correctly. However, if your version is in `V1.X.X`, then this guide should still be up to date; with less bugs. Anyway, enough blabbering. First, you'll have to go the
-[ShellFlow](https://youtube.com/watch?v=dQw4w9WgXcQ) place, then insert it into **ReplicatedStorage**.
+[ShellFlow](https://create.roblox.com/store/asset/103326929320392/ShellFlow-V110prerelease2) asset, then insert it into **ReplicatedStorage**.
 
 ![Image](Images/1.png)
 
@@ -107,51 +107,48 @@ local shellFlow = require(game.ReplicatedStorage.ShellFlow)
 
 shellFlow.server.Init()
 
-local event = shellFlow.server.StoreEvent("Event", "RemoteEvent", 1)
+local event = shellFlow.server.StoreEvent("Event", "RemoteEvent", 22)
 
 local log = shellFlow.server.Log
 
-task.wait(1)
+log("Fired to Clients", 1)
+
+event:FireAllClients("this is a passed down message")
 
 event.OnServerEvent:Connect(function(player, message, sessionKey)
 	log("OnServerEvent", 1)
 
-	local key = shellFlow.server.ReadKey("Event")
-
-	if sessionKey==key then
+	local key, accessToEvent = shellFlow.server.ReadKey(event.Name, player)
+	
+	print(sessionKey, key)
+	if sessionKey==key and accessToEvent then
 		log("Session Key Matched", 1)
 
 		print("CLIENT SAID: " .. tostring(message))
 	else
 		log("Session Key Didn't match; untruthful client", 2)
-
-		local clientLimit = event:GetAttribute("ClientLimit")
-		event:SetAttribute("ClientLimit", clientLimit+1)
-
+		
+		shellFlow.server.RemovePlayerPermissions(event.Name, player)
+		
 		print("LIAR!")
 	end
 end)
 
 task.wait(3)
 
-print(shellFlow.logs, "From the server!")
+print(shellFlow.logs)
 ```
 
 ```lua
 --- CLIENT SCRIPT ---
+local player = game:GetService("Players").LocalPlayer
+
 local shellFlow = require(game.ReplicatedStorage.ShellFlow)
 
-task.wait(1)
-
-local log = shellFlow.server.Log
-
-log("Obtained Event + key", 1)
 local event, key = shellFlow.client.ReadEvent("Event")
 
-log("FireServer", 1)
 event:FireServer("this is a passed down message", key)
-
-task.wait(3)
-
-print(shellFlow.logs, "From the client!")
+event.OnClientEvent:Connect(function(message)
+	print("SERVER SAID: " .. tostring(message))
+end)
 ```
