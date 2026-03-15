@@ -46,7 +46,7 @@ end)
 ```
 ------
 Hey! You've got yourself a neat messenger!
-## Session Locking
+## Security Overview
 ShellFlow automatically handles a ***lot*** of the security inside the module itself, but still needs some input from the user. If you look into the ShellFlow module enough, you can notice that ShellFlow creates a folder of events and keeps it within itself. Untrustworthy clients can just abuse the events from there, right?
 
 You are completely correct. This is where session keys come in. Each time a client requests access to an event, it's given a special code that is needed to access events. Now, the server receiving the input from the client will request of the code from ShellFlow, then compare it to the client's session key. If it matches, then the code is executed. Otherwise, they're blocked.
